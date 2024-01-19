@@ -4,3 +4,5 @@
 *.csv.1
 *./ny_taxi_postgres_data/**
 *.json
+ny_taxi_postgres_data/*
+ny_taxi_postgres_data/pg_*
