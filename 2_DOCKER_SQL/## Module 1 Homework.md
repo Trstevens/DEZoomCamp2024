@@ -25,7 +25,13 @@ Which tag has the following text? - *Automatically remove the container when it 
 - `--rmc`
 - `--rm`
 
---rm
+### Code: 
+```
+docker --help
+docker rm --help
+```
+
+### ANSWER: --rm
 
 
 ## Question 2. Understanding docker first run 
@@ -40,7 +46,14 @@ What is version of the package *wheel* ?
 - 23.0.1
 - 58.1.0
 
-0.42.0
+### Code:
+``` 
+docker run -it python:3.9 bash 
+pip list 
+```
+
+### ANSWER: 0.42.0
+
 
 # Prepare Postgres
 
@@ -69,7 +82,18 @@ Remember that `lpep_pickup_datetime` and `lpep_dropoff_datetime` columns are in 
 - 15859
 - 89009
 
-15612
+### Code
+
+```
+SELECT * 
+      ,DATE(y.tpep_pickup_datetime) as pickup_date
+      ,DATE(y.tpep_dropoff_datetime) as dropoff_date
+FROM public.yellow_taxi_data y
+WHERE DATE(y.tpep_pickup_datetime) = '2019-09-18'
+	AND DATE(y.tpep_dropoff_datetime) = '2019-09-18';
+```
+
+### ANSWER: 15612
 
 ## Question 4. Largest trip for each day
 
@@ -81,7 +105,17 @@ Use the pick up time for your calculations.
 - 2019-09-26
 - 2019-09-21
 
-2019-09-26
+### Code:
+```
+SELECT max(y.trip_distance) as max_distance
+	  ,DATE(y.tpep_pickup_datetime) as pickup_date
+FROM public.yellow_taxi_data y
+WHERE DATE(y.tpep_pickup_datetime) BETWEEN '2019-09-18' AND '2019-09-26'
+GROUP BY DATE(y.tpep_pickup_datetime)
+ORDER BY 1 DESC;
+```
+
+### ANSWER: 2019-09-26
 
 ## Question 5. Three biggest pick up Boroughs
 
@@ -94,7 +128,23 @@ Which were the 3 pick up Boroughs that had a sum of total_amount superior to 500
 - "Bronx" "Manhattan" "Queens" 
 - "Brooklyn" "Queens" "Staten Island"
 
-"Brooklyn" "Manhattan" "Queens"
+
+
+### Code: 
+```
+SELECT SUM(y.total_amount)
+      ,zpu."Borough"
+FROM public.yellow_taxi_data y
+LEFT JOIN public.zones zpu
+	ON y."PULocationID" = zpu."LocationID"
+LEFT JOIN public.zones zdo
+	ON y."DOLocationID" = zdo."LocationID"
+WHERE zpu."Borough" <> 'Unknown'
+GROUP BY zpu."Borough"
+HAVING SUM(y.total_amount) > 50000;
+```
+
+### ANSWER: "Brooklyn" "Manhattan" "Queens"
 
 ## Question 6. Largest tip
 
@@ -108,7 +158,21 @@ Note: it's not a typo, it's `tip` , not `trip`
 - JFK Airport
 - Long Island City/Queens Plaza
 
-JFK Airport
+### Code
+```
+SELECT MAX(y.tip_amount), zpu."Zone" as pu_zone, zdo."Zone" as do_zone
+FROM public.yellow_taxi_data y
+LEFT JOIN public.zones zpu
+	ON y."PULocationID" = zpu."LocationID"
+LEFT JOIN public.zones zdo
+	ON y."DOLocationID" = zdo."LocationID"
+WHERE zpu."Zone" = 'Astoria'
+GROUP BY zpu."Zone"
+		,zdo."Zone"
+ORDER BY 1 DESC
+```
+
+### ANSWER: JFK Airport
 
 ## Terraform
 
@@ -131,6 +195,8 @@ terraform apply
 
 Paste the output of this command into the homework submission form.
 
+### ANSWER:
+```
 google_bigquery_dataset.dataset: Creating...
 google_storage_bucket.data-lake-bucket: Creating...
 google_bigquery_dataset.dataset: Creation complete after 0s [id=projects/ny-rides-tyler-411718/datasets/ny_rides_tyler_dataset]
@@ -138,7 +204,7 @@ google_storage_bucket.data-lake-bucket: Creation complete after 0s [id=de-data-l
 
 Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 \
-
+```
 
 ## Submitting the solutions
 
